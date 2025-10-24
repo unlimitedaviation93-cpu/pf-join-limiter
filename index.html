@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Join Grup WhatsApp</title>
+  <style>
+    /* Dark mode base */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: radial-gradient(circle at top, #1e1e1e, #121212);
+      color: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Liquid glass effect */
+    .container {
+      backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 40px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.5);
+      animation: fadeIn 1s ease-out;
+    }
+
+    .datetime {
+      font-size: 1em;
+      color: #aaa;
+      margin-bottom: 10px;
+      animation: fadeIn 1.5s ease-out;
+    }
+
+    h1 {
+      font-size: 1.8em;
+      margin-bottom: 10px;
+      color: #ffffff;
+      animation: slideDown 0.6s ease-out;
+    }
+
+    p {
+      font-size: 1em;
+      color: #cccccc;
+      margin-bottom: 20px;
+      animation: fadeIn 1.2s ease-out;
+    }
+
+    #timer {
+      font-size: 1.5em;
+      color: #00ffff;
+      margin-bottom: 30px;
+      animation: pulse 2s infinite;
+    }
+
+    a.join-link {
+      display: inline-block;
+      padding: 14px 28px;
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-size: 1.1em;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    a.join-link:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+    }
+
+    a.join-link.disabled {
+      background: linear-gradient(135deg, #555, #333);
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { color: #00ffff; }
+      50% { color: #66ffff; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="datetime" class="datetime">Memuat waktu...</div>
+    <h1>Gabung Grup WhatsApp</h1>
+    <p>Link hanya aktif selama 5 jam setiap hari mulai pukul 19.00 WITA.</p>
+    <div id="timer">Memuat...</div>
+    <a id="joinLink" class="join-link disabled" href="#" target="_blank">Gabung Sekarang</a>
+  </div>
+
+  <script>
+    const joinLink = document.getElementById("joinLink");
+    const WA_URL = "https://chat.whatsapp.com/HelNvBwBQfq2Wvk28MKvu8?mode=wwc";
+
+    function updateDateTime() {
+      const now = new Date();
+      const localOffset = 8 * 60; // WITA = UTC+8
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const localTime = new Date(utc + (localOffset * 60000));
+
+      const days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+      const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+      const dayName = days[localTime.getDay()];
+      const date = localTime.getDate();
+      const monthName = months[localTime.getMonth()];
+      const year = localTime.getFullYear();
+
+      const hours = String(localTime.getHours()).padStart(2, '0');
+      const minutes = String(localTime.getMinutes()).padStart(2, '0');
+      const seconds = String(localTime.getSeconds()).padStart(2, '0');
+
+      const formatted = `${dayName}, ${date} ${monthName} ${year} — ${hours}:${minutes}:${seconds} WITA`;
+      document.getElementById("datetime").textContent = formatted;
+    }
+
+    function updateTimer() {
+      const now = new Date();
+      const localOffset = 8 * 60; // WITA = UTC+8
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const localTime = new Date(utc + (localOffset * 60000));
+
+      const startHour = 19;
+      const durationHours = 5;
+
+      let startTime = new Date(localTime);
+      startTime.setHours(startHour, 0, 0, 0);
+
+      let endTime = new Date(startTime);
+      endTime.setHours(startHour + durationHours);
+
+      if (localTime < startTime) {
+        const diff = startTime - localTime;
+        const hours = Math.floor(diff / 3600000);
+        const minutes = Math.floor((diff % 3600000) / 60000);
+        const seconds = Math.floor((diff % 60000) / 1000);
+        document.getElementById("timer").textContent = `Mulai dalam ${hours}j ${minutes}m ${seconds}d`;
+        joinLink.classList.add("disabled");
+        joinLink.href = "#";
+      } else if (localTime >= startTime && localTime < endTime) {
+        const diff = endTime - localTime;
+        const hours = Math.floor(diff / 3600000);
+        const minutes = Math.floor((diff % 3600000) / 60000);
+        const seconds = Math.floor((diff % 60000) / 1000);
+        document.getElementById("timer").textContent = `Waktu tersisa: ${hours}j ${minutes}m ${seconds}d`;
+        joinLink.classList.remove("disabled");
+        joinLink.href = WA_URL;
+      } else {
+        startTime.setDate(startTime.getDate() + 1);
+        const diff = startTime - localTime;
+        const hours = Math.floor(diff / 3600000);
+        const minutes = Math.floor((diff % 3600000) / 60000);
+        const seconds = Math.floor((diff % 60000) / 1000);
+        document.getElementById("timer").textContent = `Akan aktif lagi dalam ${hours}j ${minutes}m ${seconds}d`;
+        joinLink.classList.add("disabled");
+        joinLink.href = "#";
+      }
+    }
+
+    setInterval(() => {
+      updateDateTime();
+      updateTimer();
+    }, 1000);
+
+    updateDateTime();
+    updateTimer();
+  </script>
+</body>
+</html>
